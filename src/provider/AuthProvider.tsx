@@ -8,7 +8,7 @@ import React, {
 
 import { supabase } from "../utils/SupabaseClient";
 
-interface AuthContextProps {
+export interface AuthContextProps {
   user: object | null;
   isAuthenticated: boolean;
 }
@@ -29,11 +29,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(!!session?.user);
     });
 
-    // Cleanup subscription on component unmount
     return () => {
       if (authListener) {
-        // Unsubscribe to the listener when the component unmounts
-        authListener.data.subscription.unsubscribe();
+        authListener?.data.subscription?.unsubscribe();
       }
     };
   }, []);

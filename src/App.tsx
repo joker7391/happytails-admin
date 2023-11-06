@@ -9,17 +9,23 @@ import { ToastContainer } from "react-toastify";
 
 import Login from "./pages/login/Login";
 import Header from "./components/Header";
+import Navigation from "./components/Navigation";
+import UserManagement from "./pages/UserManagement";
+import Dashboard from "./pages/Dashboard";
 
 const AppContent = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === "/";
 
   return (
-    <div className="h-screen">
+    <div className="min-h-screen">
       {!isLoginPage && <Header />}
       <div className="flex mx-auto">
+        {!isLoginPage && <Navigation />}
         <Routes>
           <Route path="/" element={<Login email={""} password={""} />} />
+          <Route path="/usermanagement" element={<UserManagement />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
         <ToastContainer />
       </div>
