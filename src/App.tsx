@@ -8,12 +8,15 @@ import {
 import { ToastContainer } from "react-toastify";
 
 import Login from "./pages/login/Login";
+import Header from "./components/Header";
 
 const AppContent = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === "/";
+
   return (
     <div className="h-screen">
+      {!isLoginPage && <Header />}
       <div className="flex mx-auto">
         <Routes>
           <Route path="/" element={<Login email={""} password={""} />} />
