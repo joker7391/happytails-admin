@@ -15,11 +15,25 @@ const Login: React.FC<loginData> = ({ email, password }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/dashboard");
+    const { data: subscriptionData } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        const user = session?.user;
+        if (user?.email === "user@example.com") {
+          navigate("/dashboard");
+        } else if (user) {
+          // If the logged-in user is not user@example.com, handle accordingly.
+          supabase.auth.signOut();
+          alert("Access restricted to specific user.");
+        }
       }
-    });
+    );
+
+    // Cleanup function to remove the subscription when the component unmounts
+    return () => {
+      if (subscriptionData?.subscription) {
+        subscriptionData.subscription.unsubscribe();
+      }
+    };
   }, [navigate]);
 
   return (

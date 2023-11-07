@@ -1,17 +1,22 @@
 import React, { useState } from "react";
 import { supabase } from "../utils/SupabaseClient";
+import { useNavigate } from "react-router-dom";
 
 const UserDetails: React.FC = () => {
   const [firstName, setFirstName] = useState("");
-  const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
   const [email, setEmail] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [position, setPosition] = useState("");
+  const [position, setPosition] = useState("doctor");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  console.log("Email", email);
+
+  const navigate = useNavigate(); // Hook for navigating to different routes
 
   const validateForm = () => {
     if (!email || !password || !firstName || !lastName) {
@@ -22,7 +27,6 @@ const UserDetails: React.FC = () => {
       setError("Passwords do not match.");
       return false;
     }
-    // Add other validation checks as needed
     return true;
   };
 
@@ -37,24 +41,45 @@ const UserDetails: React.FC = () => {
     setError(null);
 
     try {
-      const { error: createError } = await supabase.from("admin").insert([
-        {
-          first_name: firstName,
-          //   middle_name: middleName,
-          last_name: lastName,
-          //   mobile_number: mobileNumber,
-          email: email,
-          //   password: password,
-          account_type: position,
-        },
-      ]);
+      // Step 1: Sign up user with email and password.
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-      if (createError) throw createError;
+      if (signUpError) {
+        throw signUpError;
+      }
+
+      // Check if the user was created.
+      if (data && data.user) {
+        // Step 2: Insert additional data into the `admin` table.
+        const { error: insertError } = await supabase.from("admin").insert([
+          {
+            email: email,
+            first_name: firstName,
+            last_name: lastName,
+            // Add other fields as needed
+            account_type: position,
+          },
+        ]);
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        // If everything is successful, navigate to the dashboard.
+        navigate("/dashboard");
+      }
     } catch (error) {
-      setError("An error occurred while saving the data.");
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
