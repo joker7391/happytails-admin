@@ -12,6 +12,7 @@ import Header from "./components/Header";
 import Navigation from "./components/Navigation";
 import UserManagement from "./pages/UserManagement";
 import Dashboard from "./pages/Dashboard";
+import Branch from "./pages/Branch";
 
 const AppContent = () => {
   const location = useLocation();
@@ -26,6 +27,7 @@ const AppContent = () => {
           <Route path="/" element={<Login email={""} password={""} />} />
           <Route path="/usermanagement" element={<UserManagement />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/branch" element={<Branch />} />
         </Routes>
         <ToastContainer />
       </div>
