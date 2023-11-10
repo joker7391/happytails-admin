@@ -5,6 +5,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 import { supabase } from "../../utils/SupabaseClient";
+import { toast } from "react-toastify";
 
 interface loginData {
   email: string;
@@ -21,9 +22,10 @@ const Login: React.FC<loginData> = ({ email, password }) => {
         if (user?.email === "user@example.com") {
           navigate("/dashboard");
         } else if (user) {
-          // If the logged-in user is not user@example.com, handle accordingly.
           supabase.auth.signOut();
-          alert("Access restricted to specific user.");
+          toast.success("Access restricted to specific user.", {
+            position: toast.POSITION.BOTTOM_CENTER,
+          });
         }
       }
     );

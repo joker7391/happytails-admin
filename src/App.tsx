@@ -13,6 +13,7 @@ import Navigation from "./components/Navigation";
 import UserManagement from "./pages/UserManagement";
 import Dashboard from "./pages/Dashboard";
 import Branch from "./pages/Branch";
+import Users from "./pages/Users";
 
 const AppContent = () => {
   const location = useLocation();
@@ -28,6 +29,7 @@ const AppContent = () => {
           <Route path="/usermanagement" element={<UserManagement />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/branch" element={<Branch />} />
+          <Route path="/users" element={<Users />} />
         </Routes>
         <ToastContainer />
       </div>

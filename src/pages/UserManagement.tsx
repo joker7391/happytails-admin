@@ -3,7 +3,7 @@ import UserDetails from "../components/UserDetails";
 
 const UserManagement: React.FC = () => {
   return (
-    <div className="p-2">
+    <div className="p-2 flex flex-col gap-2">
       <div className="flex gap-3">
         <h1>Menu</h1> | <h1>Users</h1>
       </div>

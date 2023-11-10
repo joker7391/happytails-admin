@@ -16,6 +16,7 @@ const Menu: React.FC = () => {
     { name: "Dashboard", path: "/dashboard" },
     { name: "User Management", path: "/usermanagement" },
     { name: "Branch", path: "/branch" },
+    { name: "Users", path: "/users" },
   ];
 
   //function for logging out

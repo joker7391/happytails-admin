@@ -85,7 +85,7 @@ const UserDetails: React.FC = () => {
   return (
     <div className="px-2 flex gap-4 relative">
       <form className="flex flex-col gap-4 h-[15em] w-[20em] py-3">
-        <div className="flex justify-between">
+        <div className="flex justify-between ">
           <label className="text-blue-400">First Name</label>
           <input
             onChange={(e) => setFirstName(e.target.value)}
@@ -114,7 +114,7 @@ const UserDetails: React.FC = () => {
           />
         </div>
       </form>
-      <form className="flex flex-col gap-4 h-[15em] w-[20em] py-3">
+      <form className="flex flex-col gap-4 h-[15em] w-[25em] py-3">
         <div className="flex justify-between">
           <label className="text-blue-400">Email</label>
           <input
@@ -142,7 +142,7 @@ const UserDetails: React.FC = () => {
           <label className="text-blue-400">Position</label>
           <select
             onChange={(e) => setPosition(e.target.value)}
-            className="border-black border-[1px] w-full"
+            className="border-black border-[1px] w-[190px] px-[1.9px] py-[1px]"
           >
             <option value="doctor">Doctor</option>
             <option value="front desk">Front Desk</option>

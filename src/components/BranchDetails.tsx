@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { supabase } from "../utils/SupabaseClient"; // Make sure this path is correct
 
 const BranchDetails = () => {
-  // State for form fields
   const [branchName, setBranchName] = useState("");
   const [streetNo, setStreetNo] = useState("");
   const [street, setStreet] = useState("");
@@ -49,7 +48,7 @@ const BranchDetails = () => {
       }
 
       // Optionally, clear form here if needed
-      clearForm();
+
       alert("Branch added successfully!");
     } catch (error: unknown) {
       if (error instanceof Error) {
