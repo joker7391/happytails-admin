@@ -39,7 +39,7 @@ const Login: React.FC<loginData> = ({ email, password }) => {
   }, [navigate]);
 
   const handleFrontDeskLogin = () => {
-    window.location.href = "https://happytails-admin.vercel.app/";
+    window.location.href = "https://happy-tails-sigma.vercel.app/";
   };
 
   return (
