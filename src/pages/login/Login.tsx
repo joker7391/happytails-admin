@@ -38,6 +38,10 @@ const Login: React.FC<loginData> = ({ email, password }) => {
     };
   }, [navigate]);
 
+  const handleFrontDeskLogin = () => {
+    window.location.href = "https://happytails-admin.vercel.app/";
+  };
+
   return (
     <div className="flex-1 flex flex-col gap-8 py-3 bg-[#fff] ">
       <h1 className="uppercase cursor-pointer text-[#2997d8] font-bold text-[20px] px-4 ">
@@ -49,7 +53,13 @@ const Login: React.FC<loginData> = ({ email, password }) => {
         <h1 className="font-bold text-[30px]">ADMIN</h1>
       </div>
       {/* Form */}
-      <div className="flex justify-center items-center w-auto">
+      <div className="flex flex-col justify-center items-center w-auto">
+        <button
+          onClick={handleFrontDeskLogin}
+          className="text-center text-blue-400 font-bold"
+        >
+          Frontdesk Login
+        </button>
         <Auth
           supabaseClient={supabase}
           appearance={{
