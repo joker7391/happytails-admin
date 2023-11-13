@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../utils/SupabaseClient";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 const UserDetails: React.FC = () => {
   const [firstName, setFirstName] = useState("");
@@ -14,12 +15,17 @@ const UserDetails: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("Email", email);
-
-  const navigate = useNavigate(); // Hook for navigating to different routes
+  const navigate = useNavigate();
 
   const validateForm = () => {
-    if (!email || !password || !firstName || !lastName) {
+    if (
+      !email ||
+      !password ||
+      !firstName ||
+      !lastName ||
+      !mobileNumber ||
+      !position
+    ) {
       setError("Please fill in all required fields.");
       return false;
     }
@@ -30,7 +36,7 @@ const UserDetails: React.FC = () => {
     return true;
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!validateForm()) {
@@ -41,7 +47,6 @@ const UserDetails: React.FC = () => {
     setError(null);
 
     try {
-      // Step 1: Sign up user with email and password.
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -51,16 +56,20 @@ const UserDetails: React.FC = () => {
         throw signUpError;
       }
 
-      // Check if the user was created.
       if (data && data.user) {
-        // Step 2: Insert additional data into the `admin` table.
-        const { error: insertError } = await supabase.from("admin").insert([
+        const userUuid = uuidv4();
+        console.log("Id", userUuid);
+
+        const { error: insertError } = await supabase.from("users").insert([
           {
+            id: userUuid,
             email: email,
             first_name: firstName,
             last_name: lastName,
-            // Add other fields as needed
-            account_type: position,
+            user_type: position,
+            contact_number: mobileNumber,
+            last_login: new Date().toISOString(),
+            created_at: new Date().toISOString(),
           },
         ]);
 
@@ -68,95 +77,92 @@ const UserDetails: React.FC = () => {
           throw insertError;
         }
 
-        // If everything is successful, navigate to the dashboard.
         navigate("/dashboard");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("An unexpected error occurred");
-      }
-    } finally {
-      setLoading(false);
+      console.error(error);
+      setError("An unexpected error occurred. Check console for details.");
     }
   };
 
   return (
     <div className="px-2 flex gap-4 relative">
-      <form className="flex flex-col gap-4 h-[15em] w-[20em] py-3">
-        <div className="flex justify-between ">
-          <label className="text-blue-400">First Name</label>
-          <input
-            onChange={(e) => setFirstName(e.target.value)}
-            className="border-black border-[1px] px-1"
-          />
+      <form onClick={handleSubmit} className="flex gap-4">
+        <div className="flex flex-col gap-4 h-[15em] w-[20em] py-3">
+          <div className="flex justify-between ">
+            <label className="text-blue-400">First Name</label>
+            <input
+              onChange={(e) => setFirstName(e.target.value)}
+              className="border-black border-[1px] px-1"
+            />
+          </div>
+          <div className="flex justify-between">
+            <label className="text-blue-400">Middle Name</label>
+            <input
+              onChange={(e) => setMiddleName(e.target.value)}
+              className="border-black border-[1px] px-1"
+            />
+          </div>
+          <div className="flex justify-between">
+            <label className="text-blue-400">Last Name</label>
+            <input
+              onChange={(e) => setLastName(e.target.value)}
+              className="border-black border-[1px] px-1"
+            />
+          </div>
+          <div className="flex justify-between">
+            <label className="text-blue-400">Mobile Number</label>
+            <input
+              onChange={(e) => setMobileNumber(e.target.value)}
+              className="border-black border-[1px] px-1"
+            />
+          </div>
         </div>
-        <div className="flex justify-between">
-          <label className="text-blue-400">Middle Name</label>
-          <input
-            onChange={(e) => setMiddleName(e.target.value)}
-            className="border-black border-[1px] px-1"
-          />
+        <div className="flex flex-col gap-4 h-[15em] w-[25em] py-3">
+          <div className="flex justify-between">
+            <label className="text-blue-400">Email</label>
+            <input
+              onChange={(e) => setEmail(e.target.value)}
+              className="border-black border-[1px] px-1"
+            />
+          </div>
+          <div className="flex justify-between">
+            <label className="text-blue-400">Password</label>
+            <input
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              className="border-black border-[1px] px-1"
+            />
+          </div>
+          <div className="flex justify-between">
+            <label className="text-blue-400">Confirm Password</label>
+            <input
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              type="password"
+              className="border-black border-[1px] px-1"
+            />
+          </div>
+          <div className="flex justify-between gap-20 ">
+            <label className="text-blue-400">Position</label>
+            <select
+              onChange={(e) => setPosition(e.target.value)}
+              className="border-black border-[1px] w-[190px] px-[1.9px] py-[1px]"
+            >
+              <option value="doctor">Doctor</option>
+              <option value="front desk">Front Desk</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
         </div>
-        <div className="flex justify-between">
-          <label className="text-blue-400">Last Name</label>
-          <input
-            onChange={(e) => setLastName(e.target.value)}
-            className="border-black border-[1px] px-1"
-          />
-        </div>
-        <div className="flex justify-between">
-          <label className="text-blue-400">Mobile Number</label>
-          <input
-            onChange={(e) => setMobileNumber(e.target.value)}
-            className="border-black border-[1px] px-1"
-          />
-        </div>
+        <button
+          type="submit"
+          className="py-1 bg-blue-400 text-white w-[5em] absolute bottom-0"
+        >
+          Save
+        </button>
       </form>
-      <form className="flex flex-col gap-4 h-[15em] w-[25em] py-3">
-        <div className="flex justify-between">
-          <label className="text-blue-400">Email</label>
-          <input
-            onChange={(e) => setEmail(e.target.value)}
-            className="border-black border-[1px] px-1"
-          />
-        </div>
-        <div className="flex justify-between">
-          <label className="text-blue-400">Password</label>
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            className="border-black border-[1px] px-1"
-          />
-        </div>
-        <div className="flex justify-between">
-          <label className="text-blue-400">Confirm Password</label>
-          <input
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            type="password"
-            className="border-black border-[1px] px-1"
-          />
-        </div>
-        <div className="flex justify-between gap-20 ">
-          <label className="text-blue-400">Position</label>
-          <select
-            onChange={(e) => setPosition(e.target.value)}
-            className="border-black border-[1px] w-[190px] px-[1.9px] py-[1px]"
-          >
-            <option value="doctor">Doctor</option>
-            <option value="front desk">Front Desk</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-      </form>
+
       {error && <p className="text-red-500">{error}</p>}
-      <button
-        onClick={handleSubmit}
-        className="py-1 bg-blue-400 text-white w-[5em] absolute bottom-0"
-      >
-        {loading ? "Loading..." : "Save"}
-      </button>
     </div>
   );
 };
