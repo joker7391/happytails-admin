@@ -9,7 +9,7 @@ const DoctorCards: React.FC = () => {
     const fetchDoctorCount = async () => {
       try {
         const { data, error, count } = await supabase
-          .from("doctors") // Make sure this is your correct table name
+          .from("doctors_profile") // Make sure this is your correct table name
           .select("*", { count: "exact" });
 
         if (error) throw error;

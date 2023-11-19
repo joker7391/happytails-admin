@@ -60,7 +60,7 @@ const UserTable = () => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-200">
             <tr>
               <th scope="col" className="px-6 py-3">
-                ID
+                Name
               </th>
               <th scope="col" className="px-6 py-3">
                 Email

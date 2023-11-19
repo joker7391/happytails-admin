@@ -50,6 +50,14 @@ const UserDetails: React.FC = () => {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            user_type: position,
+            contact_number: mobileNumber,
+          },
+        },
       });
 
       if (signUpError) {
@@ -58,7 +66,6 @@ const UserDetails: React.FC = () => {
 
       if (data && data.user) {
         const userUuid = uuidv4();
-        console.log("Id", userUuid);
 
         const { error: insertError } = await supabase.from("users").insert([
           {
@@ -82,6 +89,8 @@ const UserDetails: React.FC = () => {
     } catch (error) {
       console.error(error);
       setError("An unexpected error occurred. Check console for details.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -150,7 +159,6 @@ const UserDetails: React.FC = () => {
             >
               <option value="doctor">Doctor</option>
               <option value="front desk">Front Desk</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
         </div>

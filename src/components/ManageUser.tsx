@@ -8,7 +8,7 @@ interface User {
 }
 
 const ManageUser: React.FC<User> = ({ name, email, role }) => {
-  const [users, setUsers] = useState<User[]>([]); // This would be fetched from your backend
+  const [users, setUsers] = useState<User[]>([]);
   const [newUser, setNewUser] = useState({ name: "", email: "", role: "" });
   const [isAdding, setIsAdding] = useState(false);
 
