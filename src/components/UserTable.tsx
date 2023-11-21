@@ -8,6 +8,7 @@ interface Users {
   last_name: string;
   last_login: string | null;
   user_type: string;
+  status: string;
 }
 
 const UserTable = () => {
@@ -53,6 +54,35 @@ const UserTable = () => {
       ? "Invalid Date"
       : date.toLocaleDateString(undefined, options);
   };
+
+  const updateDoctorStatus = async (doctorId: string, newStatus: string) => {
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from("users")
+        .update({ status: newStatus })
+        .eq("id", doctorId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Update the status in the local state
+      setUsers(
+        users.map((user) => {
+          if (user.id === doctorId) {
+            return { ...user, status: newStatus };
+          }
+          return user;
+        })
+      );
+    } catch (error: any) {
+      setError(error.message || "An error occurred while updating status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="overflow-x-auto">
@@ -84,6 +114,20 @@ const UserTable = () => {
                 </td>
                 <td className="px-6 py-4">{user.email}</td>
                 <td className="px-6 py-4">{user.user_type}</td>
+                <td className="px-6 py-4">
+                  <select
+                    value={user.status}
+                    onChange={(e) =>
+                      updateDoctorStatus(user.id, e.target.value)
+                    }
+                    className="border-2 border-gray-300 rounded-md p-1"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    {/* Add more options as needed */}
+                  </select>
+                </td>
+                <td className="px-6 py-4">{formatDate(user.last_login)}</td>
               </tr>
             ))}
           </tbody>

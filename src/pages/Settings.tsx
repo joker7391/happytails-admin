@@ -1,6 +1,6 @@
 import React from "react";
 
-const Users = () => {
+const Settings = () => {
   return (
     <div className="p-2 flex flex-col gap-2">
       <div className="flex gap-3 ">
@@ -12,4 +12,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Settings;

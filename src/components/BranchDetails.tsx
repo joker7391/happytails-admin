@@ -46,9 +46,6 @@ const BranchDetails = () => {
       if (error) {
         throw error;
       }
-
-      // Optionally, clear form here if needed
-
       alert("Branch added successfully!");
     } catch (error: unknown) {
       if (error instanceof Error) {

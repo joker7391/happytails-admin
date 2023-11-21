@@ -4,25 +4,33 @@ import doctor from "../../assets/10.png";
 
 const DoctorCards: React.FC = () => {
   const [doctorCount, setDoctorCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchDoctorCount = async () => {
+    const fetchDoctorsCount = async () => {
       try {
-        const { data, error, count } = await supabase
-          .from("doctors_profile") // Make sure this is your correct table name
-          .select("*", { count: "exact" });
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("user_type", "doctor");
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
 
-        console.log("Doctors data:", data);
-        // Set state with count or fallback to 0 if count is null
-        setDoctorCount(count ?? 0);
-      } catch (error) {
-        console.error("Error fetching doctor count:", error);
+        if (data) {
+          setDoctorCount(data.length);
+        }
+      } catch (error: any) {
+        setError(error.message || "An unexpected error occurred");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchDoctorCount();
+    fetchDoctorsCount();
   }, []);
 
   return (

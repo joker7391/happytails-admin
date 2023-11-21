@@ -7,6 +7,7 @@ interface Doctor {
   first_name: string;
   last_name: string;
   last_login: string | null;
+  status: string;
 }
 
 const DoctorTable = () => {
@@ -18,7 +19,10 @@ const DoctorTable = () => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase.from("admin").select("*");
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("user_type", "doctor"); // Filter to only select doctors
 
         if (error) {
           throw error;
@@ -36,6 +40,33 @@ const DoctorTable = () => {
 
     fetchDoctors();
   }, []);
+
+  const updateDoctorStatus = async (doctorId: string, newStatus: string) => {
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from("users")
+        .update({ status: newStatus })
+        .eq("id", doctorId);
+
+      if (error) {
+        throw error;
+      }
+
+      setDoctors(
+        doctors.map((doctor) => {
+          if (doctor.id === doctorId) {
+            return { ...doctor, status: newStatus };
+          }
+          return doctor;
+        })
+      );
+    } catch (error: any) {
+      setError(error.message || "An error occurred while updating status");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Function to format the date
   const formatDate = (dateString: string | null) => {
@@ -81,6 +112,19 @@ const DoctorTable = () => {
                   {doctor.first_name} {doctor.last_name}
                 </td>
                 <td className="px-6 py-4">{doctor.email}</td>
+                <td className="px-6 py-4">
+                  <select
+                    value={doctor.status}
+                    onChange={(e) =>
+                      updateDoctorStatus(doctor.id, e.target.value)
+                    }
+                    className="border-2 border-gray-300 rounded-md p-1"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    {/* Add more options as needed */}
+                  </select>
+                </td>
                 <td className="px-6 py-4">{formatDate(doctor.last_login)}</td>
               </tr>
             ))}

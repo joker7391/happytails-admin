@@ -13,7 +13,7 @@ import Navigation from "./components/Navigation";
 import UserManagement from "./pages/UserManagement";
 import Dashboard from "./pages/Dashboard";
 import Branch from "./pages/Branch";
-import Users from "./pages/Users";
+import Settings from "./pages/Settings";
 import UserTable from "./components/UserTable";
 
 const AppContent = () => {
@@ -30,7 +30,7 @@ const AppContent = () => {
           <Route path="/usermanagement" element={<UserManagement />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/branch" element={<Branch />} />
-          <Route path="/users" element={<Users />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/userTable" element={<UserTable />} />
         </Routes>
         <ToastContainer />
