@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "../utils/SupabaseClient";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -14,6 +14,8 @@ const UserDetails: React.FC = () => {
   const [position, setPosition] = useState("doctor");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [branches, setBranches] = useState<any[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState(); // Initialize as undefined
 
   const navigate = useNavigate();
 
@@ -24,7 +26,8 @@ const UserDetails: React.FC = () => {
       !firstName ||
       !lastName ||
       !mobileNumber ||
-      !position
+      !position ||
+      !selectedBranch
     ) {
       setError("Please fill in all required fields.");
       return false;
@@ -50,14 +53,6 @@ const UserDetails: React.FC = () => {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            user_type: position,
-            contact_number: mobileNumber,
-          },
-        },
       });
 
       if (signUpError) {
@@ -77,6 +72,7 @@ const UserDetails: React.FC = () => {
             contact_number: mobileNumber,
             last_login: new Date().toISOString(),
             created_at: new Date().toISOString(),
+            branch_name: selectedBranch,
           },
         ]);
 
@@ -92,6 +88,26 @@ const UserDetails: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      let { data, error } = await supabase
+        .from("branches")
+        .select("branch_name");
+
+      if (data) {
+        setBranches(data);
+      }
+      if (error) {
+        console.error("Error fetching branches:", error);
+      }
+    };
+    fetchBranches();
+  }, []);
+
+  const handleBranchChange = (e: any) => {
+    setSelectedBranch(e.target.value);
   };
 
   return (
@@ -161,7 +177,23 @@ const UserDetails: React.FC = () => {
               <option value="front desk">Front Desk</option>
             </select>
           </div>
+          {/* Branches */}
+          <div className="flex justify-between gap-20 ">
+            <label className="text-blue-400">Branch</label>
+            <select
+              value={selectedBranch}
+              onChange={handleBranchChange}
+              className="border-black border-[1px] w-[190px] px-[1.9px] py-[1px]"
+            >
+              {branches.map((branch, index) => (
+                <option className="text-black" key={index}>
+                  {branch.branch_name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
         <button
           type="submit"
           className="py-1 bg-blue-400 text-white w-[5em] absolute bottom-0"
