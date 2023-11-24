@@ -15,12 +15,27 @@ const UserTable = () => {
   const [users, setUsers] = useState<Users[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(5);
+  const [totalUsers, setTotalUsers] = useState(0);
 
   useEffect(() => {
+    const fetchUserCount = async () => {
+      const { count } = await supabase
+        .from("users")
+        .select("id", { count: "exact" });
+      if (count) {
+        setTotalUsers(count);
+      }
+    };
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase.from("users").select("*");
+        const startIndex = (currentPage - 1) * usersPerPage; // Calculate the start index
+        const { data, error } = await supabase
+          .from("users")
+          .select("*")
+          .range(startIndex, startIndex + usersPerPage - 1); // Fetch 10 users based on the current page
 
         if (error) {
           throw error;
@@ -36,11 +51,16 @@ const UserTable = () => {
       }
     };
 
+    fetchUserCount();
     fetchUsers();
-  }, []);
+  }, [currentPage, usersPerPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return "N/A"; // Return "N/A" or similar if the date string is null or invalid
+    if (!dateString) return "N/A";
 
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
@@ -67,14 +87,10 @@ const UserTable = () => {
         throw error;
       }
 
-      // Update the status in the local state
       setUsers(
-        users.map((user) => {
-          if (user.id === doctorId) {
-            return { ...user, status: newStatus };
-          }
-          return user;
-        })
+        users.map((user) =>
+          user.id === doctorId ? { ...user, status: newStatus } : user
+        )
       );
     } catch (error: any) {
       setError(error.message || "An error occurred while updating status");
@@ -82,6 +98,8 @@ const UserTable = () => {
       setLoading(false);
     }
   };
+
+  const totalPages = Math.ceil(totalUsers / usersPerPage);
 
   return (
     <div>
@@ -107,8 +125,8 @@ const UserTable = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user, index) => (
-              <tr className="bg-white border-b hover:bg-gray-50">
+            {users.map((user) => (
+              <tr key={user.id} className="bg-white border-b hover:bg-gray-50">
                 <td className="px-6 py-4">
                   {user.first_name} {user.last_name}
                 </td>
@@ -124,7 +142,6 @@ const UserTable = () => {
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
-                    {/* Add more options as needed */}
                   </select>
                 </td>
                 <td className="px-6 py-4">{formatDate(user.last_login)}</td>
@@ -133,6 +150,29 @@ const UserTable = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      <div className="flex gap-5 py-5">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="bg-blue-400 text-white px-2 py-1 w-[5em]"
+        >
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages || totalUsers === 0}
+          className="bg-blue-400 text-white px-2 py-1 w-[5em]"
+        >
+          Next
+        </button>
+      </div>
+      {loading && <div>Loading...</div>}
+      {error && <div>Error: {error}</div>}
     </div>
   );
 };

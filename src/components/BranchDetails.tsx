@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../utils/SupabaseClient"; // Make sure this path is correct
+import { toast } from "react-toastify";
 
 const BranchDetails = () => {
   const [branchName, setBranchName] = useState("");
@@ -25,9 +26,8 @@ const BranchDetails = () => {
     setError(null);
 
     try {
-      const { error } = await supabase.from("branches").insert([
+      const { data, error } = await supabase.from("branches").insert([
         {
-          branch_id: 3,
           branch_name: branchName,
           street_no: streetNo,
           street: street,
@@ -38,22 +38,31 @@ const BranchDetails = () => {
           country: country,
           active_manager: activeManager,
           telephone_no: telephone1,
-          // telephone_no: telephone2,
+          created_at: new Date().toISOString(),
           email: email,
+          longitude: 121.06818,
+          latitude: 141.50034,
         },
       ]);
+      if (data) {
+        toast.success("Branch added successfully!", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+      }
 
       if (error) {
         throw error;
       }
-      alert("Branch added successfully!");
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setError(error.message || "An error occurred.");
+        toast.error(error.message || "An error occurred.", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
       } else {
         setError("An unexpected error occurred");
       }
     }
+    clearForm();
   };
 
   // Function to clear the form
@@ -171,14 +180,14 @@ const BranchDetails = () => {
       >
         {loading ? "Loading..." : "Add"}
       </button>
-      <button
+      {/* <button
         type="button"
         onClick={clearForm}
         className="py-1 bg-blue-400 text-white w-[5em] absolute -bottom-10 right-0"
         disabled={loading}
       >
         Clear
-      </button>
+      </button> */}
     </div>
   );
 };
